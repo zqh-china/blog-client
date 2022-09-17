@@ -1,0 +1,27 @@
+{
+  "name": "client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@wangeditor/editor": "^5.1.18",
+    "@wangeditor/editor-for-vue": "^5.1.12",
+    "axios": "^0.27.2",
+    "pinia": "^2.0.17",
+    "sass": "^1.54.0",
+    "vue": "^3.2.37",
+    "vue-router": "^4.1.2",
+    "wangeditor": "^4.7.15"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.0.0",
+    "naive-ui": "^2.31.0",
+    "vfonts": "^0.0.3",
+    "vite": "^3.0.0"
+  }
+}

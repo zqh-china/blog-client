@@ -10,8 +10,7 @@ import { AdminStore } from './stores/AdminStore'
 
 
 
-//axios.defaults.baseURL = 'http://localhost:8080'  // 部署到服务器时将这里的localhost改为项目在服务端的ip和port，就不会产生跨域问题
-axios.defaults.baseURL = 'http://1.116.127.117:8080'
+axios.defaults.baseURL = 'http://localhost:4579'  // 部署到服务器时将这里的localhost改为项目在服务端的ip和port，就不会产生跨域问题
 const { message, notification, dialog } = createDiscreteApi(["message", "dialog", "notification"])
 
 
@@ -27,7 +26,7 @@ app.use(createPinia());
 app.use(router);
 const adminStore = AdminStore()
 // axios拦截器
-axios.interceptors.request.use((config)=>{
+axios.interceptors.request.use((config) => {
     //每次请求都在headers中添加token
     config.headers.token = adminStore.token
     return config

@@ -1,6 +1,6 @@
 <template>
   <n-tabs v-model:value="tabValue" justify-content="start" type="line">
-      <n-tab-pane name="list" tab="文章列表">
+    <n-tab-pane name="list" tab="文章列表">
       <div v-for="blog in blogListInfo" style="margin-bottom:15px">
         <n-card :title="blog.title">
           {{ blog.content }}
@@ -8,7 +8,7 @@
           <template #footer>
             <n-space align="center">
               <div>发布时间：{{ blog.create_time }}</div>
-              
+
               <n-button color="#42aeff" @click="toUpdate(blog)">修改</n-button>
               <n-button color="#ff5722" @click="toDelete(blog)">删除</n-button>
             </n-space>
@@ -16,11 +16,11 @@
         </n-card>
       </div>
       <n-pagination @click="toPage(pageInfo.page)" v-model:page="pageInfo.page" :page-count="pageInfo.pageCount" />
-      </n-tab-pane>
+    </n-tab-pane>
 
-    
-    
-     <n-tab-pane name="add" tab="添加文章">
+
+
+    <n-tab-pane name="add" tab="添加文章">
       <n-form>
         <n-form-item label="标题">
           <n-input v-model:value="addArticle.title" placeholder="请输入标题" />
@@ -35,10 +35,10 @@
           <n-button @click="add">提交</n-button>
         </n-form-item>
       </n-form>
-      </n-tab-pane>
+    </n-tab-pane>
 
-      <!-- 这里禁用tab页，防止直接点击晋入修改，所有修改均通过文章的链接进入 -->
-      <n-tab-pane name="update" tab="修改文章" :disabled="true">
+    <!-- 这里禁用tab页，防止直接点击晋入修改，所有修改均通过文章的链接进入 -->
+    <n-tab-pane name="update" tab="修改文章" :disabled="true">
       <n-form>
         <n-form-item label="标题">
           <n-input v-model:value="updateArticle.title" placeholder="请输入标题" />
@@ -47,14 +47,15 @@
           <n-select v-model:value="updateArticle.category_id" :options="categortyOptions" />
         </n-form-item>
         <n-form-item label="内容">
-            <rich-text-editor v-model="updateArticle.content"></rich-text-editor>
+          <rich-text-editor v-model:modelValue="updateArticle.content" :article-id="updateArticle.id"
+            @completed="handleCompleted"></rich-text-editor>
         </n-form-item>
         <n-form-item label="">
           <n-button @click="update">提交</n-button>
         </n-form-item>
       </n-form>
     </n-tab-pane>
-  </n-tabs> 
+  </n-tabs>
 </template>
 
 <script setup>
@@ -99,6 +100,9 @@ const pageInfo = reactive({
   pageCount: 0,
   count: 0,
 })
+
+// 待删除的图片
+const deleteImage = ref([])
 
 onMounted(() => {
   loadBlogs()
@@ -158,9 +162,8 @@ const toPage = async (page) => {
 }
 
 const toUpdate = async (blog) => {
-  
+
   tabValue.value = "update"
-  console.log(tabValue.value)
   let res = await proxy.$axios.get("/blogs/detail?id=" + blog.id)
   updateArticle.id = blog.id
   updateArticle.title = res.data.rows[0].title
@@ -189,8 +192,21 @@ const toDelete = async (blog) => {
   }
 }
 
+// 处理要删除的图片
+const handleCompleted = async (images) => {
+  // let res = await proxy.$axios.delete("/blogs/_token/deleteImage?image=" + image)
+  // if (res.data.code === 200) {
+  //   message.info(res.data.msg)
+  //   loadBlogs()
+  // } else {
+  //   message.error(res.data.msg)
+  // }
+  deleteImage.value = images
+}
+
 
 </script>
 
 <style lang="scss" scoped>
+
 </style>

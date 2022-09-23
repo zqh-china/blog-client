@@ -17,17 +17,9 @@
 </template>
 
 <script setup>
-import { useRouter, RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { h } from "vue";
-const router = useRouter()
 
-
-//菜单
-// let menus = [
-//     { name: "文章管理", href: "/dashboard/article" },
-//     { name: "分类管理", href: "/dashboard/category" },
-//     { name: "退出", href: "logout" },
-// ];
 let menus = [
     {
         label: () => h(
@@ -67,16 +59,6 @@ let menus = [
   }
  
 ]
-
-//路由跳转
-// const toPage = (value) => {
-//     console.log(value); 
-//     // if (menu.href === 'logout') {
-//     //     router.push("/login")
-//     // } else {
-//     //     router.push(menu.key)
-//     // }
-// }
 
 
 

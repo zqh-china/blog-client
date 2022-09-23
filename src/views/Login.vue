@@ -20,12 +20,11 @@
 
 <script setup>
 
-import { reactive, inject, getCurrentInstance } from 'vue'
+import { reactive, inject } from 'vue'
 import { AdminStore } from '../stores/AdminStore'
 
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 const router = useRouter()
-const { proxy } = getCurrentInstance()
 
 const message = inject("message")
 const axios = inject("axios")
@@ -52,8 +51,7 @@ const admin = reactive({
 
 /**登录 */
 const login = async () => {
-    let result = await proxy.$axios.post("/admin/login", {
-    // let result = await axios.post("/blog/login", {
+    let result = await axios.post("/admin/login", {
         account: admin.account,
         password: admin.password
     });

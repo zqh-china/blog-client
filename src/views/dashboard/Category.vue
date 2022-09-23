@@ -58,10 +58,7 @@
 
 <script setup>
 
-import { AdminStore } from '../../stores/AdminStore'
-import { ref, reactive, inject, onMounted, getCurrentInstance } from 'vue'
-
-const { proxy } = getCurrentInstance()
+import { ref, reactive, inject, onMounted } from 'vue'
 
 const message = inject("message")
 const dialog = inject("dialog")
@@ -86,14 +83,12 @@ onMounted(() => {
 })
 
 const loadDatas = async () => {
-    let res = await proxy.$axios.get("/category/list")
-    // let res = await appContext.config.globalProperties.$http.get("/api/category/list")
-    // console.log(res)
+    let res = await axios.get("/category/list")
     categoryList.value = res.data.rows
 }
 
 const add = async () => {
-    let res = await proxy.$axios.post("/category/_token/add", { name: addCategory.name })
+    let res = await axios.post("/category/_token/add", { name: addCategory.name })
 
     // 如果添加成功，刷新页面
     if (res.data.code === 200) {
@@ -112,7 +107,7 @@ const toUpdate = async (category) =>{
 }
 
 const update = async ()=>{
-    let res = await proxy.$axios.put("/category/_token/update", { id:updateCategory.id, name: updateCategory.name })
+    let res = await axios.put("/category/_token/update", { id:updateCategory.id, name: updateCategory.name })
     if (res.data.code === 200) {
         loadDatas()
         message.info(res.data.msg)
@@ -130,7 +125,7 @@ const deleteCategory = async (category) => {
         positiveText: '确定',
         negativeText: '取消',
         onPositiveClick: async () => {
-            let res = await proxy.$axios.delete(`/category/_token/delete?id=${category.id}`)
+            let res = await axios.delete(`/category/_token/delete?id=${category.id}`)
             // let res = await appContext.config.globalProperties.$http.delete(`/api/category/_token/delete?id=${category.id}`)
             if (res.data.code === 200) {
                 loadDatas()
@@ -139,7 +134,9 @@ const deleteCategory = async (category) => {
                 message.error(res.data.msg)
             }
         },
-        onNegativeClick: () => { }
+        onNegativeClick: () => { 
+            message.info("取消删除")
+        }
     })
 
 

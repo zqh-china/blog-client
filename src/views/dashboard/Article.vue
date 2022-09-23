@@ -47,7 +47,7 @@
           <n-select v-model:value="updateArticle.category_id" :options="categortyOptions" />
         </n-form-item>
         <n-form-item label="内容">
-            <rich-text-editor v-model="updateArticle.content"></rich-text-editor>
+            <rich-text-editor v-model="updateArticle.content" @image-change="handleImageChange"></rich-text-editor>
         </n-form-item>
         <n-form-item label="">
           <n-button @click="update">提交</n-button>
@@ -58,18 +58,11 @@
 </template>
 
 <script setup>
-import { AdminStore } from '../../stores/AdminStore'
-import { ref, reactive, inject, onMounted, getCurrentInstance, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, reactive, inject, onMounted } from 'vue'
 import RichTextEditor from '../../components/RichTextEditor.vue'
 
-const { proxy } = getCurrentInstance()
-const router = useRouter()
-
-
 const message = inject("message")
-
-const adminStore = AdminStore()
+const axios = inject("axios")
 
 //文章添加数据
 const addArticle = reactive({
@@ -103,14 +96,13 @@ const pageInfo = reactive({
 onMounted(() => {
   loadBlogs()
   loadCategorys()
-  // console.log(tabValue.value)
 })
 
 
 
 //读取博客列表
 const loadBlogs = async () => {
-  let res = await proxy.$axios.post(`/blogs/search?page=${pageInfo.page}&pageSize=${pageInfo.pageSize}`)
+  let res = await axios.post(`/blogs/search?page=${pageInfo.page}&pageSize=${pageInfo.pageSize}`)
   // console.log(res)
   let temp_rows = res.data.data.rows;
   for (let row of temp_rows) {
@@ -125,7 +117,7 @@ const loadBlogs = async () => {
 
 //读取分类
 const loadCategorys = async () => {
-  let res = await proxy.$axios.get("/category/list")
+  let res = await axios.get("/category/list")
   categortyOptions.value = res.data.rows.map((item) => {
     return {
       label: item.name,
@@ -136,7 +128,7 @@ const loadCategorys = async () => {
 }
 
 const add = async () => {
-  let res = await proxy.$axios.post("/blogs/_token/add", addArticle)
+  let res = await axios.post("/blogs/_token/add", addArticle)
   if (res.data.code === 200) {
     message.info(res.data.msg)
     addArticle.title = ""
@@ -152,7 +144,6 @@ const add = async () => {
 
 const toPage = async (page) => {
   pageInfo.page = page;
-  // console.log(pageInfo.page);
   loadBlogs()
 
 }
@@ -161,7 +152,7 @@ const toUpdate = async (blog) => {
   
   tabValue.value = "update"
   console.log(tabValue.value)
-  let res = await proxy.$axios.get("/blogs/detail?id=" + blog.id)
+  let res = await axios.get("/blogs/detail?id=" + blog.id)
   updateArticle.id = blog.id
   updateArticle.title = res.data.rows[0].title
   updateArticle.content = res.data.rows[0].content
@@ -169,7 +160,8 @@ const toUpdate = async (blog) => {
 }
 
 const update = async () => {
-  let res = await proxy.$axios.put("/blogs/_token/update", updateArticle)
+  await deleteImage()
+  let res = await axios.put("/blogs/_token/update", updateArticle)
   if (res.data.code === 200) {
     message.info(res.data.msg)
     loadBlogs()
@@ -180,10 +172,37 @@ const update = async () => {
 }
 
 const toDelete = async (blog) => {
-  let res = await proxy.$axios.delete("/blogs/_token/delete?id=" + blog.id)
+  let res = await axios.delete("/blogs/_token/delete?id=" + blog.id)
   if (res.data.code === 200) {
     message.info(res.data.msg)
     loadBlogs()
+  } else {
+    message.error(res.data.msg)
+  }
+}
+
+// 用于记录编辑器已删除的图片
+const deletedImages = ref([])
+
+// 处理图片改变
+const handleImageChange = (imageList) => {
+  deletedImages.value = imageList
+  
+}
+
+// 删除图片
+const deleteImage = async () => {
+  if (deletedImages.value.length === 0) {
+    return
+  }
+  console.log(deletedImages.value)
+  let res = await axios.delete("/blogs/_token/deleteImages", {
+    data: {
+      images: deletedImages.value
+    }
+  })
+  if (res.data.code === 200) {
+    message.info(res.data.msg)
   } else {
     message.error(res.data.msg)
   }

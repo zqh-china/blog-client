@@ -14,9 +14,9 @@
 </template>
 
 <script setup>
-import { ref, inject, onMounted, getCurrentInstance } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-const { proxy } = getCurrentInstance()
+
 const router = useRouter()
 const route = useRoute()
 const blogInfo = ref({})
@@ -30,7 +30,7 @@ onMounted(() => {
  * 读取文章详情
  */
 const loadBlog = async () => {
-    let res = await proxy.$axios.get("/blogs/detail?id=" + route.query.id)
+    let res = await axios.get("/blogs/detail?id=" + route.query.id)
     blogInfo.value = res.data.rows[0];
 }
 

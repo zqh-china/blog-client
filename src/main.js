@@ -15,7 +15,6 @@ const { message, notification, dialog } = createDiscreteApi(["message", "dialog"
 
 
 const app = createApp(App);
-app.config.globalProperties.$axios = axios;
 app.provide('axios', axios)
 app.provide('message', message)
 app.provide('notification', notification)

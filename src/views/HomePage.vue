@@ -38,17 +38,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, inject, onMounted, computed, getCurrentInstance } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, reactive, inject, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
-const { proxy } = getCurrentInstance()
 
 // 路由
 const router = useRouter()
-const route = useRoute()
-
-const message = inject("message")
-const dialog = inject("dialog")
 const axios = inject("axios")
 
 // 选中的分类
@@ -80,7 +75,7 @@ const loadBlogs = async (page = 0) => {
     if (page !== 0) {
         pageInfo.page = page;
     }
-    let res = await proxy.$axios.post(`/blogs/search?keyword=${pageInfo.keyword}&page=${pageInfo.page}&pageSize=${pageInfo.pageSize}&category_id=${pageInfo.category_id}`)
+    let res = await axios.post(`/blogs/search?keyword=${pageInfo.keyword}&page=${pageInfo.page}&pageSize=${pageInfo.pageSize}&category_id=${pageInfo.category_id}`)
     let temp_rows = res.data.data.rows;
     // 处理获取的文章列表数据
     for (let row of temp_rows) {
@@ -107,7 +102,7 @@ const categoryName = computed(() => {
  * 获取分类列表
  */
 const loadCategorys = async () => {
-    let res = await proxy.$axios.get("/category/list")
+    let res = await axios.get("/category/list")
     categortyOptions.value = res.data.rows.map((item) => {
         return {
             label: item.name,

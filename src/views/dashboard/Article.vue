@@ -63,6 +63,7 @@ import RichTextEditor from '../../components/RichTextEditor.vue'
 
 const message = inject("message")
 const axios = inject("axios")
+const server_url = inject("server_url")
 
 //文章添加数据
 const addArticle = reactive({
@@ -172,12 +173,39 @@ const update = async () => {
 }
 
 const toDelete = async (blog) => {
-  let res = await axios.delete("/blogs/_token/delete?id=" + blog.id)
-  if (res.data.code === 200) {
-    message.info(res.data.msg)
-    loadBlogs()
+  // 删除文章之前，先删除文章中的图片
+  // 获取文章内容
+  let resContent = await axios.get("/blogs/detail?id=" + blog.id)
+  let content = resContent.data.rows[0].content
+ 
+  // 正则匹配内容中以网站server_url开头的图片地址
+  let reg = new RegExp(`src="${server_url}/upload/.*?"`, "g")
+  let imageList = content.match(reg)
+  // console.log(imageList)
+  // 对图片重新映射取图片url
+  imageList = imageList.map((item) => {
+    return {
+      src: item.replace(`src="`, "").replace(/"/g, "")
+    }
+  })
+  // console.log(imageList)
+  // 删除图片
+  let delRes = await axios.delete("/blogs/_token/deleteImages", {
+    data: {
+      images: imageList
+    }
+  })
+  if (delRes.data.code === 200) {
+    // 删除文章
+    let res = await axios.delete("/blogs/_token/delete?id=" + blog.id)
+    if (res.data.code === 200) {
+      message.info(res.data.msg)
+      loadBlogs()
+    } else {
+      message.error(res.data.msg)
+    }
   } else {
-    message.error(res.data.msg)
+    message.error(delRes.data.msg)
   }
 }
 
@@ -208,7 +236,7 @@ const deleteImage = () => {
     message.error(res.data.msg)
   }
 
-  }, 2000)
+  }, 2000)  // 延时2s是为了等待富文本编辑器组件销毁
   
 }
 

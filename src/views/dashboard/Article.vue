@@ -191,8 +191,9 @@ const handleImageChange = (imageList) => {
 }
 
 // 删除图片
-const deleteImage = async () => {
-  if (deletedImages.value.length === 0) {
+const deleteImage = () => {
+  setTimeout(async () => {
+    if (deletedImages.value.length === 0) {
     return
   }
   console.log(deletedImages.value)
@@ -206,6 +207,9 @@ const deleteImage = async () => {
   } else {
     message.error(res.data.msg)
   }
+
+  }, 2000)
+  
 }
 
 
